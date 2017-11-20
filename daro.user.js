@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Daro GIT
+// @name         Daro
 // @namespace    lasoeur.fr
 // @version      0.1
 // @description  try to take over the world!
@@ -13,57 +13,63 @@
 function submit(){
     window.open('http://www.rotopserv.net/serveurs/daro/vote/32101197','_blank');
 }
-
-function sleep(s){
-    if(s > 0){
-        var span = document.querySelector("#corps > table > tbody > tr > td > div:nth-child(5) > ul > li:nth-child(2) > span");
-        const nouveauDiv = document.createElement("div");
-        nouveauDiv.id = "fbId";
-        var display = "";
-        if(s > 60){
-            display = parseInt(s/ 60) + "minutes et ";
-        }
-        display = display + parseInt(s% 60) + " secondes";
-        const nouveauContenu = document.createTextNode("Attente de : " + display);
-        nouveauDiv.appendChild(nouveauContenu);
-
-        var temp = document.getElementById("fbId");
-        if(null !== temp){
-            temp.parentNode.removeChild(temp);
-        }
-        span.insertBefore(nouveauDiv, null);
-        setTimeout(function(){
-            sleep( s - 1);
-        }, 1000);
-    }else{
+function displayCountdow(date){
+    displayTime(date);
+    var now = new Date();
+    if(date.getTime() <= now.getTime()){
         submit();
+    }else{
+        setTimeout(function(){
+            displayCountdow(date);
+        }, 1000);
     }
 }
+function displayTime(date){
+    var nouveauDiv = null;
+    {
+        nouveauDiv = document.getElementById("fbId");
+        if(null !== nouveauDiv){
+            nouveauDiv.parentNode.removeChild(nouveauDiv);
+        }
+        nouveauDiv = document.createElement("div");
+        nouveauDiv.id = "fbId";
+        nouveauDiv.style.fontWeight='bold';
+        nouveauDiv.setAttribute("align", "center");
+    }
+    var display = "";
+    {
+        var rest = date.getTime() - new Date().getTime();
+        rest = Math.round(rest / 1000);
+        var hours   = Math.floor(rest / 3600);
+        var minutes = Math.floor((rest - (hours * 3600)) / 60);
+        var seconds = rest - (hours * 3600) - (minutes * 60);
+        if (hours   < 10) {hours   = "0"+hours;}
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) {seconds = "0"+seconds;}
+        display =   hours+':'+minutes+':'+seconds;
+    }
 
-document.body.style.fontWeight='bold';
+    const nouveauContenu = document.createTextNode("Attente de : " + display);
+    nouveauDiv.appendChild(nouveauContenu);
+    span.insertBefore(nouveauDiv, null);
+}
+function dateAdds(date, h, m, s){
+    date.setHours(date.getHours() + h );
+    date.setMinutes(date.getMinutes() + m );
+    date.setSeconds(date.getSeconds() + s );
+}
+
+// document.body.style.fontWeight='bold';
 
 var b = document.querySelector("#corps > table > tbody > tr > td > div:nth-child(5) > ul > li:nth-child(2) > span > b");
+var span = document.querySelector("#corps > table > tbody > tr > td > div:nth-child(5) > ul > li:nth-child(2) > span");
 var text = b.innerHTML;
 var res = text.split(":");
-var h = res[0];
-var m = res[1];
-var s = res[2];
 
-if(text == "maintenant"){
+if(res.length == 1){
     submit();
 }else{
-    if(h < 1 && m < 1 && s < 3){
-        setTimeout(function(){
-            submit();
-        }, 3);
-    }else{
-        var attente = 0;
-        if(m > 0){
-            attente = attente + (parseInt(m) * 60);
-        }
-        if(s > 0){
-            attente = parseInt(attente) + parseInt(s);
-        }
-        sleep(attente);
-    }
+    var date = new Date();
+    dateAdds(date, parseInt(res[0]), parseInt(res[1]), parseInt(res[2]));
+    displayCountdow(date);
 }
