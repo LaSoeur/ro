@@ -36,7 +36,16 @@ function displayTime(date){
         nouveauDiv.style.fontWeight='bold';
         nouveauDiv.setAttribute("align", "center");
     }
-    var display = "";
+
+
+    {
+        var toDate = [date.getHours(),
+                      date.getMinutes(),
+                      date.getSeconds()].join(':');
+        var newText2 = document.createElement("div");
+        newText2.textContent = "Voter à : " + toDate;
+        nouveauDiv.insertBefore(newText2, null);
+    }
     {
         var rest = date.getTime() - new Date().getTime();
         rest = Math.round(rest / 1000);
@@ -46,11 +55,14 @@ function displayTime(date){
         if (hours   < 10) {hours   = "0"+hours;}
         if (minutes < 10) {minutes = "0"+minutes;}
         if (seconds < 10) {seconds = "0"+seconds;}
-        display =   hours+':'+minutes+':'+seconds;
+        var display =   hours+':'+minutes+':'+seconds;
+
+        var newText = document.createElement("div");
+        newText.textContent = "Votez dans : " + display;
+        nouveauDiv.insertBefore(newText, null);
     }
 
-    const nouveauContenu = document.createTextNode("Attente de : " + display);
-    nouveauDiv.appendChild(nouveauContenu);
+
     span.insertBefore(nouveauDiv, null);
 }
 function dateAdds(date, h, m, s){
